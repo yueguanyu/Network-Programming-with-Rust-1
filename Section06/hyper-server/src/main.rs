@@ -1,11 +1,11 @@
-extern crate hyper;
 extern crate futures;
+extern crate hyper;
 
-use std::{ thread, time };
 use futures::future::FutureResult;
-use hyper::{Get, StatusCode};
 use hyper::header::ContentLength;
-use hyper::server::{Http, Service, Request, Response};
+use hyper::server::{Http, Request, Response, Service};
+use hyper::{Get, StatusCode};
+use std::{thread, time};
 
 fn heavy_work() -> String {
     let duration = time::Duration::from_millis(100);
@@ -24,14 +24,14 @@ impl Service for Echo {
 
     fn call(&self, req: Request) -> Self::Future {
         futures::future::ok(match (req.method(), req.path()) {
-                                (&Get, "/data") => {
-                                    let b = heavy_work().into_bytes();
-                                    Response::new()
-                                        .with_header(ContentLength(b.len() as u64))
-                                        .with_body(b)
-                                }
-                                _ => Response::new().with_status(StatusCode::NotFound),
-                            })
+            (&Get, "/data") => {
+                let b = heavy_work().into_bytes();
+                Response::new()
+                    .with_header(ContentLength(b.len() as u64))
+                    .with_body(b)
+            }
+            _ => Response::new().with_status(StatusCode::NotFound),
+        })
     }
 }
 
